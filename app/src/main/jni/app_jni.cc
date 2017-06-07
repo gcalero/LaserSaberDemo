@@ -69,7 +69,12 @@ NATIVE_METHOD(void, nativeOnSkyboxImageReady)
 (JNIEnv* env, jobject obj, jlong laser_saber_jptr, jint width, jint height, jint skybox_pos, jintArray img) {
   jboolean isCopy;
   jint *cData = env->GetIntArrayElements(img, &isCopy);
-  ptr(laser_saber_jptr)->OnSkyboxImageReady(width, height, skybox_pos, (u_char *) cData);
+
+  size_t length = sizeof(u_char) * width * height * 4;
+  u_char *aux= (u_char *) malloc(length);
+  memcpy(aux, cData, length);
+
+  ptr(laser_saber_jptr)->OnSkyboxImageReady(width, height, skybox_pos, aux);
   env->ReleaseIntArrayElements(img, cData, JNI_ABORT);
 }
 

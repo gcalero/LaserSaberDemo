@@ -172,6 +172,7 @@ void Skybox::addImage(int width, int height, jint pos, u_char *image) {
     parts[pos].width = width;
     parts[pos].height = height;
     parts[pos].data = image;
+    LOGD("add skybox image %d ", pos);
 }
 
 

@@ -189,12 +189,9 @@ public class MainActivity extends Activity {
 
     private void loadSkyboxImages() {
         String[] faces =  {
-            /*"skybox/purplenebula_rt.png", "skybox/purplenebula_lf.png",
-            "skybox/purplenebula_up.png", "skybox/purplenebula_dn.png",
-            "skybox/purplenebula_bk.png", "skybox/purplenebula_ft.png"*/
-                "skybox/right.jpg", "skybox/left.jpg",
-                "skybox/top.jpg", "skybox/bottom.jpg",
-                "skybox/back.jpg", "skybox/front.jpg"
+            "skybox/skybox_right.png", "skybox/skybox_left.png",
+            "skybox/skybox_up.png", "skybox/skybox_down.png",
+            "skybox/skybox_back.png", "skybox/skybox_front.png"
         };
 
         PngManager pngManager = new PngManager();
@@ -204,19 +201,16 @@ public class MainActivity extends Activity {
             Bitmap bitmap = pngManager.open(f, assetManager);
             int width = pngManager.getWidth(bitmap);
             int height = pngManager.getHeight(bitmap);
-
             int[] bytes= pngManager.getBytes(bitmap);
-            Log.d("SKYBOX", "Part " + pos + " w: " + width + " h:" + height+ " size: " + bytes.length);
-            /*byte[] aux = new byte[width*height*4];
-            for(int b=0;b<bytes.length;b++) {
-                aux[b*4+0] = (byte) (bytes[b]);
-                aux[b*4+1] = (byte) (bytes[b] >>> 8);
-                aux[b*4+2] = (byte) (bytes[b] >>> 16);
-                aux[b*4+3] = (byte) (bytes[b] >>> 24);
-            }*/
-
-            //Log.d("SKYBOX", "Load image: " + aux.length + "[" + aux[0] + "," + aux[1] + "," + aux[2] + "," + aux[3] + "] [" + aux[4] + "," + aux[5] + "," + aux[6] + "," + aux[7]+ "]");
-
+            for(int i=0;i<bytes.length;i++) {
+                // original format is ARGB
+                int b = (bytes[i] & 0x000000ff);
+                int g = (bytes[i] & 0x0000ff00) >> 8;
+                int r = (bytes[i] & 0x00ff0000) >> 16;
+                int a = (bytes[i] & 0xff000000) >>> 24;
+                // and I build ABGR
+                 bytes[i] = a << 24 | b << 16 | g << 8 | r;
+            }
             nativeOnSkyboxImageReady(nativeLaserSaber, width, height, pos++, bytes);
         }
     }

@@ -199,15 +199,15 @@ LaserSaberApp::LaserSaberApp(JNIEnv* env, jobject asset_mgr_obj, jlong gvr_conte
         stroke_width_(kMinStrokeWidth),
         skybox_(env, AAssetManager_fromJava(env, asset_mgr_obj)) {
     CHECK(asset_mgr_);
-    LOGD("DemoApp initialized.");
+    LOGD("LaserSaberApp initialized.");
 }
 
 LaserSaberApp::~LaserSaberApp() {
-    LOGD("DemoApp shutdown.");
+    LOGD("LaserSaberApp shutdown.");
 }
 
 void LaserSaberApp::OnResume() {
-    LOGD("DemoApp::OnResume");
+    LOGD("LaserSaberApp::OnResume");
     if (gvr_api_initialized_) {
         gvr_api_->RefreshViewerProfile();
         gvr_api_->ResumeTracking();
@@ -216,7 +216,7 @@ void LaserSaberApp::OnResume() {
 }
 
 void LaserSaberApp::OnPause() {
-    LOGD("DemoApp::OnPause");
+    LOGD("LaserSaberApp::OnPause");
     // The GL context is not preserved when pausing. Delete the drawing VBOs to
     // avoid dangling GL object IDs.
     ClearDrawing();
@@ -225,19 +225,16 @@ void LaserSaberApp::OnPause() {
 }
 
 void LaserSaberApp::OnSurfaceCreated() {
-    LOGD("DemoApp::OnSurfaceCreated");
+    LOGD("LaserSaberApp::OnSurfaceCreated");
 
-    LOGD("Initializing GL on GvrApi.");
     gvr_api_->InitializeGl();
 
-    LOGD("Initializing ControllerApi.");
     controller_api_.reset(new gvr::ControllerApi);
     CHECK(controller_api_);
     CHECK(controller_api_->Init(gvr::ControllerApi::DefaultOptions(),
                                 gvr_context_));
     controller_api_->Resume();
 
-    LOGD("Initializing framebuffer.");
     std::vector<gvr::BufferSpec> specs;
     specs.push_back(gvr_api_->CreateBufferSpec());
     framebuf_size_ = gvr_api_->GetMaximumEffectiveRenderTargetSize();
@@ -252,41 +249,20 @@ void LaserSaberApp::OnSurfaceCreated() {
     specs[0].SetSamples(2);
     swapchain_.reset(new gvr::SwapChain(gvr_api_->CreateSwapChain(specs)));
 
-    LOGD("Compiling shaders.");
-
     skybox_.init();
 
-    /*int vp = Utils::BuildShader(GL_VERTEX_SHADER, kPaintShaderVp);
-    int fp = Utils::BuildShader(GL_FRAGMENT_SHADER, kPaintShaderFp);
-    shader_ = Utils::BuildProgram(vp, fp);
-    shader_u_color_ = glGetUniformLocation(shader_, "u_Color");
-    shader_u_mvp_matrix_ = glGetUniformLocation(shader_, "u_MVP");
-    shader_u_sampler_ = glGetUniformLocation(shader_, "u_Sampler");
-    shader_a_position_ = glGetAttribLocation(shader_, "a_Position");
-    shader_a_texcoords_ = glGetAttribLocation(shader_, "a_TexCoords");*/
-    //CHECK(glGetError() == GL_NO_ERROR);
-
-    LOGD("Loading textures.");
-    /*paint_texture_ = Utils::LoadRawTextureFromAsset(
-            asset_mgr_, kPaintTexturePath, kPaintTextureWidth, kPaintTextureHeight);
-    ground_texture_ = Utils::LoadRawTextureFromAsset(
-            asset_mgr_, kGroundTexturePath, kGroundTextureWidth,
-            kGroundTextureHeight);
-    */
-    //CHECK(glGetError() == GL_NO_ERROR);
     gvr_api_initialized_ = true;
-
 
     LOGD("Init complete.");
 }
 
 void LaserSaberApp::OnSurfaceChanged(int width, int height) {
-    LOGD("DemoApp::OnSurfaceChanged %dx%d", width, height);
+    LOGD("LaserSaberApp::OnSurfaceChanged %dx%d", width, height);
 }
 
 void LaserSaberApp::OnDrawFrame() {
     PrepareFramebuffer();
-//LOGD("OnDrawFrame");
+    //LOGD("OnDrawFrame");
     // Enable blending so we get a transparency effect.
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
@@ -320,7 +296,7 @@ void LaserSaberApp::OnDrawFrame() {
     // Print new API status and connection state, if they changed.
     if (controller_state_.GetApiStatus() != old_status ||
         controller_state_.GetConnectionState() != old_connection_state) {
-        LOGD("DemoApp: controller API status: %s, connection state: %s",
+        LOGD("LaserSaberApp: controller API status: %s, connection state: %s",
              gvr_controller_api_status_to_string(controller_state_.GetApiStatus()),
              gvr_controller_connection_state_to_string(
                      controller_state_.GetConnectionState()));
@@ -328,7 +304,7 @@ void LaserSaberApp::OnDrawFrame() {
     // Print new controller battery level and charging state, if they changed.
     if (controller_state_.GetBatteryLevel() != old_battery_level ||
         controller_state_.GetBatteryCharging() != old_battery_charging) {
-        LOGD("DemoApp: controller battery level: %s, charging: %s",
+        LOGD("LaserSaberApp: controller battery level: %s, charging: %s",
              gvr::ControllerApi::ToString(controller_state_.GetBatteryLevel()),
              controller_state_.GetBatteryCharging() ? "true" : "false");
     }
