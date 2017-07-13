@@ -22,8 +22,8 @@ void Skybox::init() {
     int vp = Utils::BuildShader(GL_VERTEX_SHADER, loadShader("shaders/skybox.vs"));
     int fp = Utils::BuildShader(GL_FRAGMENT_SHADER, loadShader("shaders/skybox.fs"));
     shader_ = Utils::BuildProgram(vp, fp);
-    viewLocation_ = glGetUniformLocation(shader_, "view");
-    projectionLocation_ = glGetUniformLocation(shader_, "projection");
+    viewLocation_ = glGetUniformLocation(shader_, "viewInverse");
+    projectionLocation_ = glGetUniformLocation(shader_, "projectionInverse");
     skyboxTextureLocation_ =glGetUniformLocation(shader_, "skybox");
 
 
@@ -81,24 +81,20 @@ void Skybox::draw(gvr::Eye which_eye,
     glUseProgram(shader_);
     glActiveTexture(GL_TEXTURE_CUBE_MAP);
 
-    glUniformMatrix4fv(viewLocation_, 1, GL_FALSE, glm::value_ptr(view) );
-    glUniformMatrix4fv(projectionLocation_, 1, GL_FALSE, glm::value_ptr(projection));
+    glUniformMatrix4fv(viewLocation_, 1, GL_FALSE, glm::value_ptr(glm::inverse(view)));
+    glUniformMatrix4fv(projectionLocation_, 1, GL_FALSE, glm::value_ptr(glm::inverse(projection)));
 
     glBindVertexArray(skyboxVAO_);
     CHECK(glGetError() == GL_NO_ERROR);
 
-    //LOGD("bind GL_TEXTURE_CUBE_MAP %d", cubemapTexture_);
     glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture_);
     CHECK(glGetError() == GL_NO_ERROR);
-    //LOGD("bind GL_TEXTURE_CUBE_MAP done");
 
-    //glUniform1f(skyboxTextureLocation_, 0);
-    //CHECK(glGetError() == GL_NO_ERROR);
-
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     CHECK(glGetError() == GL_NO_ERROR);
     glBindVertexArray(0);
     CHECK(glGetError() == GL_NO_ERROR);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }
 
 char * Skybox::loadShader(const char * filename) {
@@ -131,7 +127,6 @@ GLuint Skybox::initCubemapTexture() {
 
     int width,height;
 
-    LOGD("initCubemapTexture glBindTexture");
     glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
     CHECK(glGetError() == GL_NO_ERROR);
     for(GLuint i = 0; i < loadedParts; i++)
@@ -162,6 +157,7 @@ GLuint Skybox::initCubemapTexture() {
         LOGE("*** GL CHECK FAILED at %s:%d: with error %x", __FILE__, __LINE__, error);
         abort();
     }
+
     //glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
     return textureID;
 }

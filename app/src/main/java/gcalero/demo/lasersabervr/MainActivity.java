@@ -189,9 +189,9 @@ public class MainActivity extends Activity {
 
     private void loadSkyboxImages() {
         String[] faces =  {
-            "skybox/skybox_right.png", "skybox/skybox_left.png",
-            "skybox/skybox_up.png", "skybox/skybox_down.png",
-            "skybox/skybox_back.png", "skybox/skybox_front.png"
+                "skybox/right.jpg", "skybox/left.jpg",
+                "skybox/top.jpg", "skybox/bottom.jpg",
+                "skybox/back.jpg", "skybox/front.jpg"
         };
 
         PngManager pngManager = new PngManager();
